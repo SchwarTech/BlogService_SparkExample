@@ -8,8 +8,8 @@ include RSpec::Matchers
 # psql -h 127.0.0.1 -p 7500 -U blog_owner -d blog
 
 def execute_sql(sql_code)
-    done = system "sh db_execute.sh \"#{sql_code}\""
-    raise Exception.new("Issue executing sql code: #{sql_code}") unless done
+    # done = system "sh db_execute.sh \"#{sql_code}\""
+    # raise Exception.new("Issue executing sql code: #{sql_code}") unless done
 end
 
 #
@@ -24,7 +24,7 @@ end
 # When
 #
 
-When(/^I insert a post with title "([^"]*)" and content "([^"]*)"$/) do |title, content|
+When(/^I open the webpage with title "([^"]*)" and content "([^"]*)"$/) do |title, content|
   payload = """
   {
     \"title\" : \"#{title}\",
@@ -32,112 +32,161 @@ When(/^I insert a post with title "([^"]*)" and content "([^"]*)"$/) do |title, 
     \"categories\" : []
   }
   """
-  response = RestClient.post 'http://localhost:4567/posts', payload, :content_type => :json, :accept => :json
-  expect(response.code).to eq(201)
+#  response = RestClient.post 'http://localhost:4567/jeff', payload, :content_type => :json, :accept => :json
+#  expect(response.code).to eq(201)
 end
 
-When(/^I edit post ([a-f0-9-]+) setting title="([^"]*)"$/) do |uuid, title|
-  payload = """
-  {
-    \"title\" : \"#{title}\"
-  }
-  """
-  response = RestClient.put "http://localhost:4567/posts/#{uuid}", payload, :content_type => :json, :accept => :json
-  expect(response.code).to eq(200)
-end
+# When(/^I insert a post with title "([^"]*)" and content "([^"]*)"$/) do |title, content|
+#   payload = """
+#   {
+#     \"title\" : \"#{title}\",
+#     \"content\" : \"#{content}\",
+#     \"categories\" : []
+#   }
+#   """
+#   response = RestClient.post 'http://localhost:4567/posts', payload, :content_type => :json, :accept => :json
+#   expect(response.code).to eq(201)
+# end
 
-When(/^I edit post ([a-f0-9-]+) setting content="([^"]*)"$/) do |uuid, content|
-  payload = """
-  {
-    \"content\" : \"#{content}\"
-  }
-  """
-  response = RestClient.put "http://localhost:4567/posts/#{uuid}", payload, :content_type => :json, :accept => :json
-  expect(response.code).to eq(200)
-end
-
-When(/^I delete post ([a-f0-9-]+)$/) do |uuid|
-    begin
-      response = RestClient.delete "http://localhost:4567/posts/#{uuid}"
-      expect(response.code).to eq(200)
-    rescue RestClient::InternalServerError => e
-        STDERR.puts (e.methods)
-        throw e
-    end
-end
+# When(/^I edit post ([a-f0-9-]+) setting title="([^"]*)"$/) do |uuid, title|
+#   payload = """
+#   {
+#     \"title\" : \"#{title}\"
+#   }
+#   """
+#   response = RestClient.put "http://localhost:4567/posts/#{uuid}", payload, :content_type => :json, :accept => :json
+#   expect(response.code).to eq(200)
+# end
+#
+# When(/^I edit post ([a-f0-9-]+) setting content="([^"]*)"$/) do |uuid, content|
+#   payload = """
+#   {
+#     \"content\" : \"#{content}\"
+#   }
+#   """
+#   response = RestClient.put "http://localhost:4567/posts/#{uuid}", payload, :content_type => :json, :accept => :json
+#   expect(response.code).to eq(200)
+# end
+#
+# When(/^I delete post ([a-f0-9-]+)$/) do |uuid|
+#     begin
+#       response = RestClient.delete "http://localhost:4567/posts/#{uuid}"
+#       expect(response.code).to eq(200)
+#     rescue RestClient::InternalServerError => e
+#         STDERR.puts (e.methods)
+#         throw e
+#     end
+# end
 
 #
 # Then
 #
 
-Then(/^I have (\d+) posts?$/) do |n_posts|
-    begin
-      response = RestClient.get 'http://localhost:4567/posts'      
-      expect(response.code).to eq(200)
-      data = JSON.parse(response.body)
-      expect(data.count).to eq(n_posts.to_i)
-    rescue RestClient::InternalServerError => e
-        STDERR.puts (e.methods)
-        throw e
-    end
+Then(/^I have (\d+) jeffs?$/) do |n_jeffs|
+  begin
+    response = RestClient.get 'http://localhost:4567/jeff'
+    expect(response.code).to eq(200)
+    data = JSON.parse(response.body)
+    expect(data.count).to eq(n_jeffs.to_i)
+  rescue RestClient::InternalServerError => e
+    STDERR.puts (e.methods)
+    throw e
+  end
 end
 
-Then(/^the post has title "([^"]*)"$/) do |title|
-    begin
-      response = RestClient.get 'http://localhost:4567/posts'      
-      expect(response.code).to eq(200)
-      data = JSON.parse(response.body)
-      expect(data[0]["title"]).to eq(title)
-    rescue RestClient::InternalServerError => e
-        STDERR.puts (e.methods)
-        throw e
-    end
+Then(/^the jeff has title "([^"]*)"$/) do |title|
+  begin
+    response = RestClient.get 'http://localhost:4567/jeff'
+    expect(response.code).to eq(200)
+    data = JSON.parse(response.body)
+    expect(data[0]["title"]).to eq(title)
+  rescue RestClient::InternalServerError => e
+    STDERR.puts (e.methods)
+    throw e
+  end
 end
 
-Then(/^the post has content "([^"]*)"$/) do |content|
-    begin
-      response = RestClient.get 'http://localhost:4567/posts'      
-      expect(response.code).to eq(200)
-      data = JSON.parse(response.body)
-      expect(data[0]["content"]).to eq(content)
-    rescue RestClient::InternalServerError => e
-        STDERR.puts (e.methods)
-        throw e
-    end
+Then(/^the jeff has content "([^"]*)"$/) do |content|
+  begin
+    response = RestClient.get 'http://localhost:4567/jeff'
+    expect(response.code).to eq(200)
+    data = JSON.parse(response.body)
+    expect(data[0]["content"]).to eq(content)
+  rescue RestClient::InternalServerError => e
+    STDERR.puts (e.methods)
+    throw e
+  end
 end
 
-Then(/^the post ([a-f0-9-]+) has title "([^"]*)"$/) do |uuid, title|
-    begin
-      response = RestClient.get "http://localhost:4567/posts/#{uuid}"      
-      expect(response.code).to eq(200)
-      data = JSON.parse(response.body)
-      expect(data["title"]).to eq(title)
-    rescue RestClient::InternalServerError => e
-        STDERR.puts (e.methods)
-        throw e
-    end
-end
 
-Then(/^the post ([a-f0-9-]+) has content "([^"]*)"$/) do |uuid, content|
-    begin
-      response = RestClient.get "http://localhost:4567/posts/#{uuid}"      
-      expect(response.code).to eq(200)
-      data = JSON.parse(response.body)
-      expect(data["content"]).to eq(content)
-    rescue RestClient::InternalServerError => e
-        STDERR.puts (e.methods)
-        throw e
-    end
-end
+# Then(/^I have (\d+) posts?$/) do |n_posts|
+#     begin
+#       response = RestClient.get 'http://localhost:4567/posts'
+#       expect(response.code).to eq(200)
+#       data = JSON.parse(response.body)
+#       expect(data.count).to eq(n_posts.to_i)
+#     rescue RestClient::InternalServerError => e
+#         STDERR.puts (e.methods)
+#         throw e
+#     end
+# end
 
-Then(/^post ([a-f0-9-]+) is not found$/) do |uuid|
-    begin
-      response = RestClient.get "http://localhost:4567/posts/#{uuid}"      
-      expect(response.code).to eq(404)
-    rescue RestClient::ResourceNotFound => e
-        # good!
-    rescue RestClient::InternalServerError => e
-        STDERR.puts (e.methods)
-        throw e
-    end
-end
+# Then(/^the post has title "([^"]*)"$/) do |title|
+#     begin
+#       response = RestClient.get 'http://localhost:4567/posts'
+#       expect(response.code).to eq(200)
+#       data = JSON.parse(response.body)
+#       expect(data[0]["title"]).to eq(title)
+#     rescue RestClient::InternalServerError => e
+#         STDERR.puts (e.methods)
+#         throw e
+#     end
+# end
+
+# Then(/^the post has content "([^"]*)"$/) do |content|
+#     begin
+#       response = RestClient.get 'http://localhost:4567/posts'
+#       expect(response.code).to eq(200)
+#       data = JSON.parse(response.body)
+#       expect(data[0]["content"]).to eq(content)
+#     rescue RestClient::InternalServerError => e
+#         STDERR.puts (e.methods)
+#         throw e
+#     end
+# end
+
+# Then(/^the post ([a-f0-9-]+) has title "([^"]*)"$/) do |uuid, title|
+#     begin
+#       response = RestClient.get "http://localhost:4567/posts/#{uuid}"
+#       expect(response.code).to eq(200)
+#       data = JSON.parse(response.body)
+#       expect(data["title"]).to eq(title)
+#     rescue RestClient::InternalServerError => e
+#         STDERR.puts (e.methods)
+#         throw e
+#     end
+# end
+
+# Then(/^the post ([a-f0-9-]+) has content "([^"]*)"$/) do |uuid, content|
+#     begin
+#       response = RestClient.get "http://localhost:4567/posts/#{uuid}"
+#       expect(response.code).to eq(200)
+#       data = JSON.parse(response.body)
+#       expect(data["content"]).to eq(content)
+#     rescue RestClient::InternalServerError => e
+#         STDERR.puts (e.methods)
+#         throw e
+#     end
+# end
+
+# Then(/^post ([a-f0-9-]+) is not found$/) do |uuid|
+#     begin
+#       response = RestClient.get "http://localhost:4567/posts/#{uuid}"
+#       expect(response.code).to eq(404)
+#     rescue RestClient::ResourceNotFound => e
+#         # good!
+#     rescue RestClient::InternalServerError => e
+#         STDERR.puts (e.methods)
+#         throw e
+#     end
+# end

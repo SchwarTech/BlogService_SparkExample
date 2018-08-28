@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
 import me.tomassetti.handlers.*;
+import me.tomassetti.model.JeffModel;
 import me.tomassetti.model.Model;
 import me.tomassetti.sql2omodel.Sql2oModel;
 import org.sql2o.Sql2o;
@@ -33,43 +34,19 @@ public class BlogService
         new JCommander(options, args);
 
         logger.finest("Options.debug = " + options.debug);
-        logger.finest("Options.database = " + options.database);
-        logger.finest("Options.dbHost = " + options.dbHost);
-        logger.finest("Options.dbUsername = " + options.dbUsername);
-        logger.finest("Options.dbPort = " + options.dbPort);
         logger.finest("Options.servicePort = " + options.servicePort);
 
         port(options.servicePort);
 
-        Sql2o sql2o = new Sql2o("jdbc:postgresql://" + options.dbHost + ":" + options.dbPort + "/" + options.database,
-                options.dbUsername, options.dbPassword, new PostgresQuirks() {
-            {
-                // make sure we use default UUID converter.
-                converters.put(UUID.class, new UUIDConverter());
-            }
-        });
-
-        Model model = new Sql2oModel(sql2o);
+        Model model = new JeffModel();
         FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine();
         Configuration freeMarkerConfiguration = new Configuration();
         freeMarkerConfiguration.setTemplateLoader(new ClassTemplateLoader(BlogService.class, "/"));
         freeMarkerEngine.setConfiguration(freeMarkerConfiguration);
 
-        // insert a post (using HTTP post method)
-        post("/posts", new PostsCreateHandler(model));
-
-        // get all post (using HTTP get method)
-        get("/posts", new PostsIndexHandler(model));
-
-        get("/posts/:uuid", new GetSinglePostHandler(model));
-
-        put("/posts/:uuid", new PostsEditHandler(model));
-
-        delete("/posts/:uuid", new PostsDeleteHandler(model));
-
-        post("/posts/:uuid/comments", new CommentsCreateHandler(model));
-
-        get("/posts/:uuid/comments", new CommentsListHandler(model));
+        // get all jeff (using HTTP get method)
+        get("/jeff", new JeffIndexHandler(model));
+        post("/jeff", new JeffIndexHandler(model));
 
         get("/alive", new Route() {
             @Override
